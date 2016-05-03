@@ -18,16 +18,26 @@ module RedisPage
           add_infos(urls, info)
         end
         add_clazz_infos(urls)
+        clear_info(urls)
         fetch_infos(urls)
       end
 
       def invalidate_clazz_cache
         urls = {}
         add_clazz_infos(urls)
+        clear_info(urls)
         fetch_infos(urls)
       end
 
       private
+
+      def clear_info(urls)
+        urls.values.each do |info|
+          cur_key = info['url'] + '-' + info['country']
+          RedisPage.redis.del(cur_key)
+        end
+      end
+
       def add_infos(urls, info)
         info = JSON.parse(info)
         key = "#{info['url']}-#{info['country']}"
